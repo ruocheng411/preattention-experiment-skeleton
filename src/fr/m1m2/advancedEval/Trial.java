@@ -2,15 +2,18 @@ package fr.m1m2.advancedEval;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import fr.lri.swingstates.canvas.CEllipse;
 import fr.lri.swingstates.canvas.CExtensionalTag;
 import fr.lri.swingstates.canvas.CRectangle;
 import fr.lri.swingstates.canvas.CRectangularShape;
@@ -32,13 +35,26 @@ public class Trial {
 	protected CExtensionalTag instructions = new CExtensionalTag() {};
 	protected CExtensionalTag visualMarks = new CExtensionalTag(){};
     protected CExtensionalTag targetMark = new CExtensionalTag(){};
+    
+    protected ArrayList<Double> listX = new ArrayList<Double>(){};
+    protected ArrayList<Double> listY = new ArrayList<Double>(){};
+    
+    protected double mouseX;
+    protected double mouseY;
+    
+    protected double targetX;
+    protected double targetY;
+    
+    protected double time1,time2,timeTotal;
+   
 	
 	protected KeyListener enterListener = new KeyAdapter() {
 		
 		@Override
 		public void keyPressed(KeyEvent e){
 			if(e.getKeyCode() == KeyEvent.VK_ENTER){
-				System.out.println("\t ENTER");
+				time1 = System.currentTimeMillis();
+				System.out.println("press ENTER");
 				hideInstructions();
 				Canvas canvas = experiment.getCanvas();
 				canvas.removeKeyListener(enterListener);
@@ -52,7 +68,8 @@ public class Trial {
 		@Override
 		public void keyPressed(KeyEvent e){
 			if(e.getKeyCode() == KeyEvent.VK_SPACE){
-				System.out.println("\t SPACE");
+				System.out.println("press SPACE");
+				time2 = System.currentTimeMillis();
 				hideMainScene();
 				Canvas canvas = experiment.getCanvas();
 				canvas.removeKeyListener(spaceListener);
@@ -67,7 +84,11 @@ public class Trial {
 	protected MouseListener clickListener = new MouseAdapter(){
 		@Override
 		public void mousePressed(MouseEvent e){
-			System.out.println("\t MOUSE");
+			System.out.println("click MOUSE");
+			mouseX = e.getX();
+			mouseY = e.getY();
+			System.out.println("mouse position"+mouseX+","+mouseY);
+			
 			hidePlaceholders();
 			Canvas canvas = experiment.getCanvas();
 			canvas.removeMouseListener(clickListener);
@@ -80,8 +101,10 @@ public class Trial {
 		this.block = block;
 		this.trial = trial;
 		this.visualVariable = targetChange;
-//		this.visualVariable = "VV1VV2";
 		this.objectsCount = nonTargetsCount;
+
+//		this.visualVariable = "VV1VV2";
+//		this.objectsCount=36;
 		this.experiment = experiment;
 	}
 	
@@ -119,21 +142,14 @@ public class Trial {
 	}
 	
 	public void displayMainScene(){
-		//System.out.println(x);
 		System.out.println(visualVariable+" "+objectsCount);
 		Canvas canvas = experiment.getCanvas();
 		canvas.removeShapes(visualMarks);
+		canvas.removeShapes(targetMark);
 		
-		//canvas.addKeyListener(spaceListener);
-		
-		//rect.setFillPaint(Color.RED);
-		
-		//System.out.println(visualVariable+"................");
 		//ObjectCount, L, target
 		if (visualVariable.equals("VV1")){
-			//CRectangle rect = canvas.newRectangle(0,0,15,30);
-			//rect.addTag(visualMarks);
-			
+		
 			System.out.println("The visual variable is VV1");
 			ArrayList<CShape> listShapes = new ArrayList<CShape>();
 			double rand = Math.random();//random number [0,1]	
@@ -142,6 +158,11 @@ public class Trial {
 				ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
 				CRectangle targetRect = canvas.newRectangle(0, 0, 15,30);
 				targetRect.addTag(targetMark);
+				
+				System.out.println("-------test-------");
+				System.out.println(targetMark);
+				
+				targetRect.setPickable(true);
 				targetRect.setFillPaint(Color.LIGHT_GRAY);
 				rectList.add(targetRect);
 				for(int i=1;i<objectsCount;i++){
@@ -150,27 +171,25 @@ public class Trial {
 					rect.addTag(visualMarks);
 					rectList.add(rect);
 				}
-				//rect.setFillPaint(Color.LIGHT_GRAY);
-				rectList.set(0, targetRect);
-				//rectList.get(0).setFillPaint(Color.LIGHT_GRAY);//the first object is light gray in color
-				for(int i=1;i<objectsCount;i++){
-					rectList.get(i).setFillPaint(Color.GRAY);//the rest are gray in color
-				}
+				
 				System.out.println("==========");
 				for(int i=0;i<objectsCount;i++){
-					//rect.setFillPaint(Color.BLACK);
 					listShapes.add(rectList.get(i));	
-					System.out.println(listShapes.get(i).getFillPaint());
-					
-				}				
+				}	
+				System.out.println("---- first element in the list ----");
+				System.out.println(listShapes.get(0).getTags());
 				
 			}
 			else{
-				//CRectangle targetRect = canvas.newRectangle(0, 0, 15,30);
 				
 				ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
 				CRectangle targetRect = canvas.newRectangle(0, 0, 15,30);
 				targetRect.addTag(targetMark);
+				
+				System.out.println("-------test-------");
+				System.out.println(targetMark);
+				
+				targetRect.setPickable(true);
 				targetRect.setFillPaint(Color.GRAY);
 				rectList.add(targetRect);
 				for(int i=1;i<objectsCount;i++){
@@ -180,136 +199,110 @@ public class Trial {
 					rectList.add(rect);
 				}
 				
-				//rect.setFillPaint(Color.LIGHT
-				rectList.set(0, targetRect);
-				//rectList.get(0).setFillPaint(Color.GRAY);//the first object is gray in color
-				for(int i=1;i<objectsCount;i++){
-					rectList.get(i).setFillPaint(Color.LIGHT_GRAY);//the rest are gray in color
-				}
 				System.out.println("==========");
 				for(int i=0;i<objectsCount;i++){
-					//rect.setFillPaint(Color.GRAY);
-					//listShapes.add(rect);
 					listShapes.add(rectList.get(i));
-					System.out.println(listShapes.get(i).getFillPaint());
 				}
+				
+				System.out.println("---- first element in the list ----");
+				System.out.println(listShapes.get(0).getTags());
 				
 			}
 			
 			
 			Collections.shuffle(listShapes);
 			System.out.println("--------------");
-			for(int i=0;i<objectsCount;i++){
-				//listShapes.add(rect);	
-				System.out.println(listShapes.get(i).getFillPaint());
-			}
-			
 			double canvasWidth = canvas.getPreferredSize().getWidth();
 			double canvasHeight = canvas.getPreferredSize().getHeight();
 			
 			
 			for(int i=0;i<objectsCount;i++){
-				double randNum1 = Math.random();
-				double randNum2 = Math.random();
+				double randNum1 = canvasWidth * Math.random();
+				double randNum2 = canvasHeight * Math.random();
+				listShapes.get(i).translateTo(randNum1, randNum2);
 				
-				//CShape tRect = listShapes.get(i);
-				//tRect.translateTo(randNum1*canvasWidth, randNum2*canvasHeight);
-				//listShapes.set(i, tRect);
-				listShapes.get(i).translateTo(randNum1*canvasWidth, randNum2*canvasHeight);
+				listX.add(randNum1);
+				listY.add(randNum2);
 				
-				//canvas.add(canvas,listShapes.get(i));
-				//canvas.addShape(listShapes.get(i));
-				System.out.println(listShapes.get(i).getCenterX()+", "+listShapes.get(i).getCenterY());
+//				System.out.println("list position: "+listX.get(i)+","+listY.get(i)+" "+listX.size());
+				if(listShapes.get(i).hasTag(targetMark)){
+					targetX = listShapes.get(i).getCenterX();
+					targetY = listShapes.get(i).getCenterY();
+				}
+				
+//				System.out.println("listShapes position: "+listShapes.get(i).getCenterX()+","+listShapes.get(i).getCenterY()+ " "+listShapes.get(i).getTags());
+				
 			}
-			
-			
-						
-		}
-		else if(visualVariable.equals("VV2")){
+				
+		}else if(visualVariable.equals("VV2")){
 			System.out.println("The visual variable is VV2");
 						
 			ArrayList<CShape> listShapes = new ArrayList<CShape>();
 			double rand = Math.random();//random number [0,1]	
-			//CRectangle targetRect = canvas.newRectangle(0, 0, 15,30);
-			//targetRect.addTag(targetMark);
-			//targetRect.setFillPaint(Color.LIGHT_GRAY);
 			if(rand<0.5){
-				//rect.setFillPaint(Color.LIGHT_GRAY);
 				ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
 				
 				CRectangle rectHorizontal = canvas.newRectangle(0, 0, 30,15);
-				//CRectangle rectVertical = canvas.newRectangle(0, 0, 15,30);
-				
-				rectHorizontal.addTag(visualMarks);
-				
 				rectHorizontal.setFillPaint(Color.LIGHT_GRAY);
-				
-				
-				//CRectangle targetRect = rectHorizontal;	
-				//CRectangle otherRect = rectVertical;
-				
 				rectHorizontal.addTag(targetMark);
+				rectHorizontal.setPickable(true);
+				rectList.add(rectHorizontal);
 				
-				rectList.add(0, rectHorizontal);
 				for(int i=1;i<objectsCount;i++){
 					CRectangle rectVertical = canvas.newRectangle(0, 0, 15,30);
 					rectVertical.addTag(visualMarks);
 					rectVertical.setFillPaint(Color.LIGHT_GRAY);
-					rectList.add(i, rectVertical);
+					rectList.add(rectVertical);
 				}
 				
-				System.out.println("==========");
 				for(int i=0;i<objectsCount;i++){
 					listShapes.add(rectList.get(i));	
-					System.out.println(listShapes.get(i).getHeight());
 				}				
 			}
 			else{
 				ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+				
 				CRectangle rectVertical = canvas.newRectangle(0, 0, 15,30);
-				rectVertical.addTag(visualMarks);
 				rectVertical.setFillPaint(Color.LIGHT_GRAY);				
 				
 				rectVertical.addTag(targetMark);
+				rectVertical.setPickable(true);
 				
-				rectList.add(0, rectVertical);
+				rectList.add(rectVertical);
 				
 				for(int i=1;i<objectsCount;i++){
 					CRectangle rectHorizontal = canvas.newRectangle(0, 0, 30,15);
 					rectHorizontal.addTag(visualMarks);
 					rectHorizontal.setFillPaint(Color.LIGHT_GRAY);
-					rectList.add(i,rectHorizontal);
+					rectList.add(rectHorizontal);
 				}
-				System.out.println("==========");
 				for(int i=0;i<objectsCount;i++){
 					listShapes.add(rectList.get(i));
-					System.out.println(listShapes.get(i).getHeight());
 				}
 				
 			}
 			Collections.shuffle(listShapes);
-			for(int i=0;i<objectsCount;i++){
-				System.out.println(listShapes.get(i).getHeight());
-			}
-			
+		
 			double canvasWidth = canvas.getPreferredSize().getWidth();
 			double canvasHeight = canvas.getPreferredSize().getHeight();
 			
 			
 			for(int i=0;i<objectsCount;i++){
-				double randNum1 = Math.random();
-				double randNum2 = Math.random();
-				listShapes.get(i).translateTo(randNum1*canvasWidth, randNum2*canvasHeight);
-				System.out.println(listShapes.get(i).getCenterX()+", "+listShapes.get(i).getCenterY());
+				double randNum1 = canvasWidth * Math.random();
+				double randNum2 = canvasHeight * Math.random();
+				listX.add(randNum1);
+				listY.add(randNum2);
+				listShapes.get(i).translateTo(randNum1, randNum2);
+				if(listShapes.get(i).hasTag(targetMark)){
+					targetX = listShapes.get(i).getCenterX();
+					targetY = listShapes.get(i).getCenterY();
+				}
+				System.out.println("listShapes: "+ listShapes.get(i).getCenterX()+", "+listShapes.get(i).getCenterY() + " "+listShapes.get(i).getTags());
 			}
-		}
-		else if(visualVariable.equals("VV1VV2")){
+		}else if(visualVariable.equals("VV1VV2")){
 			System.out.println("The visual variable is VV1VV2");
-			if(objectsCount==9){
-				
-				
-				ArrayList<CShape> listShapes = new ArrayList<CShape>();
-				
+			ArrayList<CShape> listShapes = new ArrayList<CShape>();
+			if(objectsCount==9){	
 				double rand = Math.random();//random number [0,1]	
 				if(rand<0.25){
 					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
@@ -327,7 +320,6 @@ public class Trial {
 					CRectangle rectVerticalDark2 = canvas.newRectangle(0, 0, 15,30);
 					CRectangle rectVerticalDark3 = canvas.newRectangle(0, 0, 15,30);
 					
-					rectHorizontalLight.addTag(visualMarks);
 					
 					rectVerticalLight1.addTag(visualMarks);
 					rectVerticalLight2.addTag(visualMarks);
@@ -354,6 +346,7 @@ public class Trial {
 					rectVerticalDark3.setFillPaint(Color.GRAY);
 					
 					rectHorizontalLight.addTag(targetMark);
+					rectHorizontalLight.setPickable(true);
 					
 					rectList.add(0, rectHorizontalLight);
 					rectList.add(1, rectVerticalLight1);
@@ -366,9 +359,8 @@ public class Trial {
 					rectList.add(8, rectVerticalDark3);
 					
 					for(int i=0;i<objectsCount;i++){
-						//rect.setFillPaint(Color.BLACK);
 						listShapes.add(rectList.get(i));	
-						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
+//						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
 					}			
 					
 				}
@@ -391,8 +383,6 @@ public class Trial {
 					rectHorizontalLight1.addTag(visualMarks);
 					rectHorizontalLight2.addTag(visualMarks);
 					
-					rectVerticalLight.addTag(visualMarks);
-					
 					rectHorizontalDark1.addTag(visualMarks);
 					rectHorizontalDark2.addTag(visualMarks);
 					rectHorizontalDark3.addTag(visualMarks);
@@ -414,12 +404,9 @@ public class Trial {
 					rectVerticalDark2.setFillPaint(Color.GRAY);
 					rectVerticalDark3.setFillPaint(Color.GRAY);
 					
-					//CRectangle targetRect = rectVerticalLight;
-					//CRectangle rect1 = rectHorizontalLight;
-					//CRectangle rect2 = rectHorizontalDark;
-					//CRectangle rect3 = rectVerticalDark;
 					
 					rectVerticalLight.addTag(targetMark);
+					rectVerticalLight.setPickable(true);
 					
 					rectList.add(0, rectVerticalLight);
 					rectList.add(1, rectHorizontalLight1);
@@ -432,9 +419,8 @@ public class Trial {
 					rectList.add(8, rectVerticalDark3);
 					
 					for(int i=0;i<objectsCount;i++){
-						//rect.setFillPaint(Color.BLACK);
 						listShapes.add(rectList.get(i));	
-						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
+//						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
 					}		
 				}
 				else if(((rand>0.5)||(rand==0.5))&&rand<0.75){
@@ -460,7 +446,6 @@ public class Trial {
 					rectVerticalLight2.addTag(visualMarks);
 					rectVerticalLight3.addTag(visualMarks);
 					
-					rectHorizontalDark.addTag(visualMarks);
 					
 					rectVerticalDark1.addTag(visualMarks);
 					rectVerticalDark2.addTag(visualMarks);
@@ -479,8 +464,8 @@ public class Trial {
 					rectVerticalDark2.setFillPaint(Color.GRAY);
 					rectVerticalDark3.setFillPaint(Color.GRAY);
 					
-					
 					rectHorizontalDark.addTag(targetMark);
+					rectHorizontalDark.setPickable(true);
 					
 					rectList.add(0, rectHorizontalDark);
 					rectList.add(1, rectHorizontalLight1);
@@ -494,9 +479,8 @@ public class Trial {
 					
 					for(int i=0;i<objectsCount;i++){
 						listShapes.add(rectList.get(i));	
-						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
-					}		
-					
+//						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
+					}			
 				}
 				else{
 					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
@@ -525,7 +509,6 @@ public class Trial {
 					rectHorizontalDark2.addTag(visualMarks);
 					rectHorizontalDark3.addTag(visualMarks);
 					
-					rectVerticalDark.addTag(visualMarks);
 					
 					rectHorizontalLight1.setFillPaint(Color.LIGHT_GRAY);
 					rectHorizontalLight2.setFillPaint(Color.LIGHT_GRAY);
@@ -540,12 +523,8 @@ public class Trial {
 					
 					rectVerticalDark.setFillPaint(Color.GRAY);
 					
-					//CRectangle targetRect = rectVerticalDark;
-					//CRectangle rect1 = rectHorizontalLight;
-					//CRectangle rect2 = rectVerticalLight;
-					//CRectangle rect3 = rectHorizontalDark;
-					
 					rectVerticalDark.addTag(targetMark);
+					rectVerticalDark.setPickable(true);
 					
 					
 					rectList.add(0, rectVerticalDark);
@@ -559,55 +538,513 @@ public class Trial {
 					rectList.add(8, rectHorizontalDark3);
 					
 					for(int i=0;i<objectsCount;i++){
-						//rect.setFillPaint(Color.BLACK);
 						listShapes.add(rectList.get(i));	
-						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
+					}			
+				}
+			}
+			else if(objectsCount==16){
+				
+				double rand = Math.random();//random number [0,1]	
+				if(rand<0.25){
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);
+					rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+					
+					ArrayList<CRectangle> rectVerticalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalDarkList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectVerticalDarkList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<5;i++){
+						CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);					
+						rectVerticalLight.addTag(visualMarks);
+						rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectVerticalLightList.add(rectVerticalLight);						
+						
+						CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalDark.addTag(visualMarks);
+						rectHorizontalDark.setFillPaint(Color.GRAY);
+						rectHorizontalDarkList.add(rectHorizontalDark);
+						
+						CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+						rectVerticalDark.addTag(visualMarks);
+						rectVerticalDark.setFillPaint(Color.GRAY);
+						rectVerticalDarkList.add(rectVerticalDark);
+					}									
+					
+					rectHorizontalLight.addTag(targetMark);
+					rectHorizontalLight.setPickable(true);
+					
+					rectList.add(rectHorizontalLight);
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectVerticalLightList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectHorizontalDarkList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectVerticalDarkList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+					}			
+				}
+				else if(((rand>0.25)||(rand==0.25))&&(rand<0.5)){
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);
+					rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+					
+					ArrayList<CRectangle> rectHorizontalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalDarkList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectVerticalDarkList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<5;i++){
+						CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);					
+						rectHorizontalLight.addTag(visualMarks);
+						rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectHorizontalLightList.add(rectHorizontalLight);						
+						
+						CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalDark.addTag(visualMarks);
+						rectHorizontalDark.setFillPaint(Color.GRAY);
+						rectHorizontalDarkList.add(rectHorizontalDark);
+						
+						CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+						rectVerticalDark.addTag(visualMarks);
+						rectVerticalDark.setFillPaint(Color.GRAY);
+						rectVerticalDarkList.add(rectVerticalDark);
+					}									
+					
+					rectVerticalLight.addTag(targetMark);
+					rectVerticalLight.setPickable(true);
+					
+					rectList.add(rectVerticalLight);
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectHorizontalLightList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectHorizontalDarkList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectVerticalDarkList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+					}
+				}
+				else if(((rand>0.5)||(rand==0.5))&&rand<0.75){
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+					rectHorizontalDark.setFillPaint(Color.GRAY);
+					
+					ArrayList<CRectangle> rectVerticalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectVerticalDarkList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<5;i++){
+						CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);					
+						rectVerticalLight.addTag(visualMarks);
+						rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectVerticalLightList.add(rectVerticalLight);						
+						
+						CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalLight.addTag(visualMarks);
+						rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectHorizontalLightList.add(rectHorizontalLight);
+						
+						CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+						rectVerticalDark.addTag(visualMarks);
+						rectVerticalDark.setFillPaint(Color.GRAY);
+						rectVerticalDarkList.add(rectVerticalDark);
+					}									
+					
+					rectHorizontalDark.addTag(targetMark);
+					rectHorizontalDark.setPickable(true);
+					
+					rectList.add(rectHorizontalDark);
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectVerticalLightList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectHorizontalLightList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectVerticalDarkList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+					}								
+				}
+				else{
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+					rectVerticalDark.setFillPaint(Color.GRAY);
+					
+					ArrayList<CRectangle> rectVerticalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalDarkList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalLightList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<5;i++){
+						CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);					
+						rectVerticalLight.addTag(visualMarks);
+						rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectVerticalLightList.add(rectVerticalLight);						
+						
+						CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalDark.addTag(visualMarks);
+						rectHorizontalDark.setFillPaint(Color.GRAY);
+						rectHorizontalDarkList.add(rectHorizontalDark);
+						
+						CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalLight.addTag(visualMarks);
+						rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectHorizontalLightList.add(rectHorizontalLight);
+					}									
+					
+					rectVerticalDark.addTag(targetMark);
+					rectVerticalDark.setPickable(true);
+					
+					rectList.add(rectVerticalDark);
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectVerticalLightList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectHorizontalDarkList.get(i));
+					}
+					
+					for(int i=0;i<5;i++){
+						rectList.add(rectHorizontalLightList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+					}		
+				}		
+			}else if(objectsCount==36){
+				double rand = Math.random();//random number [0,1]	
+				if(rand<0.25){
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);
+					rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+					
+					ArrayList<CRectangle> rectVerticalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalDarkList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectVerticalDarkList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<12;i++){
+						CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);					
+						rectVerticalLight.addTag(visualMarks);
+						rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectVerticalLightList.add(rectVerticalLight);						
+						
+						CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalDark.addTag(visualMarks);
+						rectHorizontalDark.setFillPaint(Color.GRAY);
+						rectHorizontalDarkList.add(rectHorizontalDark);
+						
+						
+					}
+					
+					for(int i=0;i<11;i++){
+						CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+						rectVerticalDark.addTag(visualMarks);
+						rectVerticalDark.setFillPaint(Color.GRAY);
+						rectVerticalDarkList.add(rectVerticalDark);
+					}
+					
+					rectHorizontalLight.addTag(targetMark);
+					rectHorizontalLight.setPickable(true);
+					
+					rectList.add(rectHorizontalLight);
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectVerticalLightList.get(i));
+					}
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectHorizontalDarkList.get(i));
+					}
+					
+					for(int i=0;i<11;i++){
+						rectList.add(rectVerticalDarkList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+					}			
+				}
+				else if(((rand>0.25)||(rand==0.25))&&(rand<0.5)){
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);
+					rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+					
+					ArrayList<CRectangle> rectHorizontalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalDarkList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectVerticalDarkList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<12;i++){
+						CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);					
+						rectHorizontalLight.addTag(visualMarks);
+						rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectHorizontalLightList.add(rectHorizontalLight);						
+												
+						CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+						rectVerticalDark.addTag(visualMarks);
+						rectVerticalDark.setFillPaint(Color.GRAY);
+						rectVerticalDarkList.add(rectVerticalDark);
+					}	
+					
+					for(int i=0;i<11;i++){
+						CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalDark.addTag(visualMarks);
+						rectHorizontalDark.setFillPaint(Color.GRAY);
+						rectHorizontalDarkList.add(rectHorizontalDark);
+					}
+					
+					rectVerticalLight.addTag(targetMark);
+					rectVerticalLight.setPickable(true);
+					
+					rectList.add(rectVerticalLight);
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectHorizontalLightList.get(i));
+					}
+					
+					for(int i=0;i<11;i++){
+						rectList.add(rectHorizontalDarkList.get(i));
+					}
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectVerticalDarkList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+					}
+				}
+				else if(((rand>0.5)||(rand==0.5))&&rand<0.75){
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+					rectHorizontalDark.setFillPaint(Color.GRAY);
+					
+					ArrayList<CRectangle> rectVerticalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectVerticalDarkList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<12;i++){
+															
+						CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalLight.addTag(visualMarks);
+						rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectHorizontalLightList.add(rectHorizontalLight);
+						
+						CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+						rectVerticalDark.addTag(visualMarks);
+						rectVerticalDark.setFillPaint(Color.GRAY);
+						rectVerticalDarkList.add(rectVerticalDark);
+					}	
+					
+					for(int i=0;i<11;i++){
+						CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);					
+						rectVerticalLight.addTag(visualMarks);
+						rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectVerticalLightList.add(rectVerticalLight);		
+					}
+					
+					rectHorizontalDark.addTag(targetMark);
+					rectHorizontalDark.setPickable(true);
+					
+					rectList.add(rectHorizontalDark);
+					
+					for(int i=0;i<11;i++){
+						rectList.add(rectVerticalLightList.get(i));
+					}
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectHorizontalLightList.get(i));
+					}
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectVerticalDarkList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+//						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
 					}		
 					
 				}
-				
-				Collections.shuffle(listShapes);
-				System.out.println("--------------");
-				for(int i=0;i<objectsCount;i++){
-					//listShapes.add(rect);	
-					System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());
+				else{
+					ArrayList<CRectangle> rectList = new ArrayList<CRectangle>();
+					
+					CRectangle rectVerticalDark = canvas.newRectangle(0, 0, 15,30);
+					rectVerticalDark.setFillPaint(Color.GRAY);
+					
+					ArrayList<CRectangle> rectVerticalLightList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalDarkList = new ArrayList<CRectangle>();
+					ArrayList<CRectangle> rectHorizontalLightList = new ArrayList<CRectangle>();
+					
+					for(int i=0;i<12;i++){
+						CRectangle rectVerticalLight = canvas.newRectangle(0, 0, 15,30);					
+						rectVerticalLight.addTag(visualMarks);
+						rectVerticalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectVerticalLightList.add(rectVerticalLight);						
+						
+						CRectangle rectHorizontalDark = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalDark.addTag(visualMarks);
+						rectHorizontalDark.setFillPaint(Color.GRAY);
+						rectHorizontalDarkList.add(rectHorizontalDark);
+											
+					}	
+					
+					for(int i=0;i<11;i++){
+						CRectangle rectHorizontalLight = canvas.newRectangle(0, 0, 30,15);
+						rectHorizontalLight.addTag(visualMarks);
+						rectHorizontalLight.setFillPaint(Color.LIGHT_GRAY);
+						rectHorizontalLightList.add(rectHorizontalLight);
+					}
+					
+					rectVerticalDark.addTag(targetMark);
+					rectVerticalDark.setPickable(true);
+					
+					rectList.add(rectVerticalDark);
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectVerticalLightList.get(i));
+					}
+					
+					for(int i=0;i<12;i++){
+						rectList.add(rectHorizontalDarkList.get(i));
+					}
+					
+					for(int i=0;i<11;i++){
+						rectList.add(rectHorizontalLightList.get(i));
+					}
+					
+					
+					for(int i=0;i<objectsCount;i++){
+						listShapes.add(rectList.get(i));	
+//						System.out.println(listShapes.get(i).getWidth()+", "+listShapes.get(i).getHeight()+", "+listShapes.get(i).getFillPaint());					
+					}		
+					
+				}		
+			}
+					
+			Collections.shuffle(listShapes);
+		
+			double canvasWidth = canvas.getPreferredSize().getWidth();
+			double canvasHeight = canvas.getPreferredSize().getHeight();
+			
+			for(int i=0;i<objectsCount;i++){
+				double randNum1 = Math.random();
+				double randNum2 = Math.random();
+				listX.add(randNum1*canvasWidth);
+				listY.add(randNum2*canvasHeight);
+				listShapes.get(i).translateTo(randNum1*canvasWidth, randNum2*canvasHeight);
+				if(listShapes.get(i).hasTag(targetMark)){
+					targetX = listShapes.get(i).getCenterX();
+					targetY = listShapes.get(i).getCenterY();
 				}
 				
-				double canvasWidth = canvas.getPreferredSize().getWidth();
-				double canvasHeight = canvas.getPreferredSize().getHeight();
-				
-				
-				for(int i=0;i<objectsCount;i++){
-					double randNum1 = Math.random();
-					double randNum2 = Math.random();
-					listShapes.get(i).translateTo(randNum1*canvasWidth, randNum2*canvasHeight);
-					System.out.println(listShapes.get(i).getCenterX()+", "+listShapes.get(i).getCenterY());
-				}				
-			}
+//				System.out.println("listShapes: "+ listShapes.get(i).getCenterX()+", "+listShapes.get(i).getCenterY() + " "+listShapes.get(i).getTags());
+			}				
+			
 		}
-					
-		
 		canvas.addKeyListener(spaceListener);
 	}
 	
 	public void hideMainScene(){
 		Canvas canvas = experiment.getCanvas();
-		canvas.removeShapes(visualMarks);
-		canvas.removeShapes(targetMark);
-//		canvas.addMouseListener(clickListener);
+		visualMarks.setDrawable(false);
+		targetMark.setDrawable(false);
 	}
 	
 	public void displayPlaceholders(){
 		Canvas canvas = experiment.getCanvas();
 		
-		CRectangle rect = canvas.newRectangle(0, 0, 30, 30);
-		rect.setFillPaint(Color.BLUE);
-		rect.addTag(visualMarks);
+		ArrayList<CEllipse> listPlaceholders = new ArrayList<CEllipse>();
+		
+		for(int i=0;i<objectsCount;i++){			
+			CEllipse ph = canvas.newEllipse(0,0, 20, 20);
+			ph.setFillPaint(Color.WHITE);
+	
+			ph.translateTo(listX.get(i), listY.get(i));
+			if(ph.getCenterX()==targetX && ph.getCenterY()==targetY){
+				ph.addTag(targetMark);
+//				System.out.println("tag added");
+			}
+			ph.addTag(visualMarks);
+			listPlaceholders.add(ph);
+			
+		}
+		
+		
 	}
 	
 	public void hidePlaceholders(){
 		Canvas canvas = experiment.getCanvas();
+		Point2D.Double pt = new Point2D.Double();
+		pt.x=mouseX;
+		pt.y=mouseY;
+		
+		System.out.println(pt.x+","+pt.y);
+		CShape picked = canvas.pick(pt);
+		System.out.println("----- picked position -----");
+		System.out.println(picked.getTags());
+		System.out.println(picked.getCenterX()+","+picked.getCenterY());
+		System.out.println("----- target position -----");
+		System.out.println(targetMark);
+		System.out.println(targetMark.getCenterX()+","+targetMark.getCenterY());
+		System.out.println("---- visual marks ----");
+		System.out.println(visualMarks);
+		
+		if(picked.hasTag(targetMark)){
+			System.out.println("Right!");
+			timeTotal = time2 - time1;
+			System.out.println("time Total = time1 ("+time1+") - time2 ("+time2+") = " +timeTotal+" MS");
+		}
+		else if(!picked.hasTag(targetMark)){
+			System.out.println("Not right; Redo");
+//			canvas.removeShapes(visualMarks);
+			experiment.currentTrial--;
+			listX.clear();
+			listY.clear();
+			System.out.println("trial: "+experiment.currentTrial);
+			
+		}
+		else System.out.println("fail");
+		
+		
+	
 		canvas.removeShapes(visualMarks);
+		canvas.removeShapes(targetMark);
 	}
 	
 
@@ -619,7 +1056,6 @@ public class Trial {
 	public void stop(){
 		
 	}
-	
 	//VV1: Color VV2:Size
 	
 	

@@ -46,7 +46,7 @@ public class Experiment {
 	
 
 	public Experiment() {
-
+		
 	}
 
 	public void start() {
@@ -112,19 +112,19 @@ public class Experiment {
 //			} catch (FileNotFoundException e) {
 //				e.printStackTrace();
 //			}
-			
+//			
 	}
 
 	public void nextTrial() {
 		// ...
 		currentTrial++;
 		if(currentTrial < allTrials.size()){
-			allTrials.get(currentTrial).displayInstructions();
-			System.out.println("currentTrial: "+ currentTrial);
+			allTrials.get(currentTrial).displayInstructions();	
+			System.out.println("currentTrial "+currentTrial);
 		}else{
-			allTrials.clear();
 			System.out.println("finish!");
 		}
+		
 	}
 
 	/*******************************/
