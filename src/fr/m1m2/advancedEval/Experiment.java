@@ -36,6 +36,7 @@ public class Experiment {
 
 	protected ArrayList<Trial> allTrials = new ArrayList<Trial>();
 	protected int currentTrial = 0;
+	protected boolean repeat = false;
 	
 	protected Canvas canvas;
 	
@@ -65,7 +66,7 @@ public class Experiment {
 	
 	public void initScene() {
 		JFrame frame = new JFrame("Experiment -- preattention");
-		canvas = new Canvas(700, 550);
+		canvas = new Canvas(900, 650);
 		frame.getContentPane().add(canvas);
 		frame.pack();
 		frame.setVisible(true);
@@ -85,7 +86,6 @@ public class Experiment {
 					int b = Integer.parseInt(parts[2]); // block
 					int t = Integer.parseInt(parts[3]); // trial
 					String vv = parts[4];
-					//String vv = "VV1";
 					int objectsCount = Integer.parseInt(parts[5]);
 										// ...
 					Trial tl = new Trial(this, practice, b,t, vv, objectsCount);
@@ -102,29 +102,43 @@ public class Experiment {
 	}
 
 	public void initLog() {
-//		String logFileName = "log_S"+participant+"_"+System.currentTimeMillis()+".csv"; 
-//		File logFile = new File(logFileName);
-//		try {
-//			pwLog = new PrintWriter(logFile); String header =
-//			"Time\t" +"Block\t" +"Trial\t" +"TargetChange\t" +"ObjectsCount\t" +"Duration\t" +"Hit\t" +"Practice\n";
-//			pwLog.print(header);
-//			pwLog.flush();
-//			} catch (FileNotFoundException e) {
-//				e.printStackTrace();
-//			}
-//			
+		String logFileName = "log_S"+participant+"_"+System.currentTimeMillis()+".csv"; 
+		File logFile = new File(logFileName);
+		try {
+			pwLog = new PrintWriter(logFile); 
+			String header =
+                    "Time,"
+                    +"Block,"
+                    +"Trial,"
+                    +"Practice,"
+                    +"VisualVariable,"
+                    +"ObjectsCount,"
+                    +"Duration\n";
+			pwLog.print(header);
+			pwLog.flush();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+
 	}
 
 	public void nextTrial() {
 		// ...
-		currentTrial++;
+		String newLog = System.currentTimeMillis()+","+allTrials.get(currentTrial).block+","+allTrials.get(currentTrial).trial+","+allTrials.get(currentTrial).practice+","+allTrials.get(currentTrial).visualVariable+","
+		+allTrials.get(currentTrial).objectsCount+","+allTrials.get(currentTrial).timeTotal+"\n";
+		if(currentTrial>0 && repeat==false){
+			System.out.println(newLog);
+			pwLog.print(newLog);
+			pwLog.flush();
+		}
+		
 		if(currentTrial < allTrials.size()){
 			allTrials.get(currentTrial).displayInstructions();	
 			System.out.println("currentTrial "+currentTrial);
 		}else{
-			System.out.println("finish!");
+			System.out.println("Finish!");
 		}
-		
+		currentTrial++;
 	}
 
 	/*******************************/

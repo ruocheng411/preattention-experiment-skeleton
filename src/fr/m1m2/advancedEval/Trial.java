@@ -12,6 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.function.DoubleToLongFunction;
 
 import fr.lri.swingstates.canvas.CEllipse;
 import fr.lri.swingstates.canvas.CExtensionalTag;
@@ -87,7 +88,7 @@ public class Trial {
 			System.out.println("click MOUSE");
 			mouseX = e.getX();
 			mouseY = e.getY();
-			System.out.println("mouse position"+mouseX+","+mouseY);
+//			System.out.println("mouse position"+mouseX+","+mouseY);
 			
 			hidePlaceholders();
 			Canvas canvas = experiment.getCanvas();
@@ -159,8 +160,8 @@ public class Trial {
 				CRectangle targetRect = canvas.newRectangle(0, 0, 15,30);
 				targetRect.addTag(targetMark);
 				
-				System.out.println("-------test-------");
-				System.out.println(targetMark);
+//				System.out.println("-------test-------");
+//				System.out.println(targetMark);
 				
 				targetRect.setPickable(true);
 				targetRect.setFillPaint(Color.LIGHT_GRAY);
@@ -172,12 +173,12 @@ public class Trial {
 					rectList.add(rect);
 				}
 				
-				System.out.println("==========");
+//				System.out.println("==========");
 				for(int i=0;i<objectsCount;i++){
 					listShapes.add(rectList.get(i));	
 				}	
-				System.out.println("---- first element in the list ----");
-				System.out.println(listShapes.get(0).getTags());
+//				System.out.println("---- first element in the list ----");
+//				System.out.println(listShapes.get(0).getTags());
 				
 			}
 			else{
@@ -186,8 +187,8 @@ public class Trial {
 				CRectangle targetRect = canvas.newRectangle(0, 0, 15,30);
 				targetRect.addTag(targetMark);
 				
-				System.out.println("-------test-------");
-				System.out.println(targetMark);
+//				System.out.println("-------test-------");
+//				System.out.println(targetMark);
 				
 				targetRect.setPickable(true);
 				targetRect.setFillPaint(Color.GRAY);
@@ -199,35 +200,35 @@ public class Trial {
 					rectList.add(rect);
 				}
 				
-				System.out.println("==========");
+//				System.out.println("==========");
 				for(int i=0;i<objectsCount;i++){
 					listShapes.add(rectList.get(i));
 				}
 				
-				System.out.println("---- first element in the list ----");
-				System.out.println(listShapes.get(0).getTags());
+//				System.out.println("---- first element in the list ----");
+//				System.out.println(listShapes.get(0).getTags());
 				
 			}
 			
 			
 			Collections.shuffle(listShapes);
-			System.out.println("--------------");
-			double canvasWidth = canvas.getPreferredSize().getWidth();
-			double canvasHeight = canvas.getPreferredSize().getHeight();
 			
 			
-			for(int i=0;i<objectsCount;i++){
-				double randNum1 = canvasWidth * Math.random();
-				double randNum2 = canvasHeight * Math.random();
-				listShapes.get(i).translateTo(randNum1, randNum2);
-				
-				listX.add(randNum1);
-				listY.add(randNum2);
-				
-//				System.out.println("list position: "+listX.get(i)+","+listY.get(i)+" "+listX.size());
-				if(listShapes.get(i).hasTag(targetMark)){
-					targetX = listShapes.get(i).getCenterX();
-					targetY = listShapes.get(i).getCenterY();
+			int loopNum = (int)Math.sqrt(objectsCount);
+			for(int i=0;i<loopNum;i++){
+				for(int j=0; j<loopNum;j++){
+					double posX = 200 + i * 80;
+					double posY = 80 + j * 80;
+
+					int index = i*loopNum+j;
+					listShapes.get(index).translateTo(posX, posY);
+					listX.add(posX);
+					listY.add(posY);	
+	//				System.out.println("list position: "+listX.get(i)+","+listY.get(i)+" "+listX.size());
+					if(listShapes.get(index).hasTag(targetMark)){
+						targetX = listShapes.get(index).getCenterX();
+						targetY = listShapes.get(index).getCenterY();
+					}
 				}
 				
 //				System.out.println("listShapes position: "+listShapes.get(i).getCenterX()+","+listShapes.get(i).getCenterY()+ " "+listShapes.get(i).getTags());
@@ -283,22 +284,27 @@ public class Trial {
 			}
 			Collections.shuffle(listShapes);
 		
-			double canvasWidth = canvas.getPreferredSize().getWidth();
-			double canvasHeight = canvas.getPreferredSize().getHeight();
-			
-			
-			for(int i=0;i<objectsCount;i++){
-				double randNum1 = canvasWidth * Math.random();
-				double randNum2 = canvasHeight * Math.random();
-				listX.add(randNum1);
-				listY.add(randNum2);
-				listShapes.get(i).translateTo(randNum1, randNum2);
-				if(listShapes.get(i).hasTag(targetMark)){
-					targetX = listShapes.get(i).getCenterX();
-					targetY = listShapes.get(i).getCenterY();
+			int loopNum = (int)Math.sqrt(objectsCount);
+			for(int i=0;i<loopNum;i++){
+				for(int j=0; j<loopNum;j++){
+					double posX = 200 + i * 80;
+					double posY = 80 + j * 80;
+
+					int index = i*loopNum+j;
+					listShapes.get(index).translateTo(posX, posY);
+					listX.add(posX);
+					listY.add(posY);	
+	//				System.out.println("list position: "+listX.get(i)+","+listY.get(i)+" "+listX.size());
+					if(listShapes.get(index).hasTag(targetMark)){
+						targetX = listShapes.get(index).getCenterX();
+						targetY = listShapes.get(index).getCenterY();
+					}
 				}
-				System.out.println("listShapes: "+ listShapes.get(i).getCenterX()+", "+listShapes.get(i).getCenterY() + " "+listShapes.get(i).getTags());
+				
+//				System.out.println("listShapes position: "+listShapes.get(i).getCenterX()+","+listShapes.get(i).getCenterY()+ " "+listShapes.get(i).getTags());
+				
 			}
+			
 		}else if(visualVariable.equals("VV1VV2")){
 			System.out.println("The visual variable is VV1VV2");
 			ArrayList<CShape> listShapes = new ArrayList<CShape>();
@@ -959,22 +965,27 @@ public class Trial {
 					
 			Collections.shuffle(listShapes);
 		
-			double canvasWidth = canvas.getPreferredSize().getWidth();
-			double canvasHeight = canvas.getPreferredSize().getHeight();
 			
-			for(int i=0;i<objectsCount;i++){
-				double randNum1 = Math.random();
-				double randNum2 = Math.random();
-				listX.add(randNum1*canvasWidth);
-				listY.add(randNum2*canvasHeight);
-				listShapes.get(i).translateTo(randNum1*canvasWidth, randNum2*canvasHeight);
-				if(listShapes.get(i).hasTag(targetMark)){
-					targetX = listShapes.get(i).getCenterX();
-					targetY = listShapes.get(i).getCenterY();
+			int loopNum = (int)Math.sqrt(objectsCount);
+			for(int i=0;i<loopNum;i++){
+				for(int j=0; j<loopNum;j++){
+					double posX = 200 + i * 80;
+					double posY = 80 + j * 80;
+
+					int index = i*loopNum+j;
+					listShapes.get(index).translateTo(posX, posY);
+					listX.add(posX);
+					listY.add(posY);	
+	//				System.out.println("list position: "+listX.get(i)+","+listY.get(i)+" "+listX.size());
+					if(listShapes.get(index).hasTag(targetMark)){
+						targetX = listShapes.get(index).getCenterX();
+						targetY = listShapes.get(index).getCenterY();
+					}
 				}
 				
-//				System.out.println("listShapes: "+ listShapes.get(i).getCenterX()+", "+listShapes.get(i).getCenterY() + " "+listShapes.get(i).getTags());
-			}				
+//				System.out.println("listShapes position: "+listShapes.get(i).getCenterX()+","+listShapes.get(i).getCenterY()+ " "+listShapes.get(i).getTags());
+				
+			}
 			
 		}
 		canvas.addKeyListener(spaceListener);
@@ -1014,19 +1025,20 @@ public class Trial {
 		pt.x=mouseX;
 		pt.y=mouseY;
 		
-		System.out.println(pt.x+","+pt.y);
+//		System.out.println(pt.x+","+pt.y);
 		CShape picked = canvas.pick(pt);
-		System.out.println("----- picked position -----");
-		System.out.println(picked.getTags());
-		System.out.println(picked.getCenterX()+","+picked.getCenterY());
-		System.out.println("----- target position -----");
-		System.out.println(targetMark);
-		System.out.println(targetMark.getCenterX()+","+targetMark.getCenterY());
-		System.out.println("---- visual marks ----");
-		System.out.println(visualMarks);
-		
+//		System.out.println("----- picked position -----");
+//		System.out.println(picked.getTags());
+//		System.out.println(picked.getCenterX()+","+picked.getCenterY());
+//		System.out.println("----- target position -----");
+//		System.out.println(targetMark);
+//		System.out.println(targetMark.getCenterX()+","+targetMark.getCenterY());
+//		System.out.println("---- visual marks ----");
+//		System.out.println(visualMarks);
+	
 		if(picked.hasTag(targetMark)){
 			System.out.println("Right!");
+			experiment.repeat=false;
 			timeTotal = time2 - time1;
 			System.out.println("time Total = time1 ("+time1+") - time2 ("+time2+") = " +timeTotal+" MS");
 		}
@@ -1034,6 +1046,7 @@ public class Trial {
 			System.out.println("Not right; Redo");
 //			canvas.removeShapes(visualMarks);
 			experiment.currentTrial--;
+			experiment.repeat = true;
 			listX.clear();
 			listY.clear();
 			System.out.println("trial: "+experiment.currentTrial);
